@@ -37,12 +37,12 @@ class UserControllerTest {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/user"))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("xiaowang")))
-                .andExpect(jsonPath("$[0].gender", is("famale")))
-                .andExpect(jsonPath("$[0].age", is(19)))
-                .andExpect(jsonPath("$[0].email", is("a@thoughtworks.com")))
-                .andExpect(jsonPath("$[0].phone", is("18888888888")))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[2].name", is("xiaowang")))
+                .andExpect(jsonPath("$[2].gender", is("famale")))
+                .andExpect(jsonPath("$[2].age", is(19)))
+                .andExpect(jsonPath("$[2].email", is("a@thoughtworks.com")))
+                .andExpect(jsonPath("$[2].phone", is("18888888888")))
                 .andExpect(status().isOk());
     }
 
@@ -84,6 +84,22 @@ class UserControllerTest {
         String jsonString = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @Order(6)
+    public void should_get_users() throws Exception {
+        User user1 = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
+        User user2 = new User("wendy", "male", 30, "a@thoughtworks.com", "18888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString1 = objectMapper.writeValueAsString(user1);
+        String jsonString2 = objectMapper.writeValueAsString(user2);
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]", is(jsonString1)))
+                .andExpect(jsonPath("$[1]", is(jsonString2)))
+                .andExpect(status().isOk());
     }
 
 

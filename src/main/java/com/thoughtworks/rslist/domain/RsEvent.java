@@ -1,8 +1,5 @@
 package com.thoughtworks.rslist.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.NotNull;
 
 
@@ -14,12 +11,12 @@ public class RsEvent {
     @NotNull
     private User user;
 
-    @JsonIgnore
+ //   @JsonIgnore
     public User getUser() {
         return user;
     }
 
-    @JsonProperty
+  //  @JsonProperty
     public void setUser(User user) {
         this.user = user;
     }
