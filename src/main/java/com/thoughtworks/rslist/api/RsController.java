@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -13,10 +14,11 @@ public class RsController {
     private List<RsEvent> rsList = initRsEventList();
 
     private List<RsEvent> initRsEventList() {
+        User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
         List<RsEvent> rsEventList = new ArrayList<>();
-        rsEventList.add(new RsEvent("第一条事件", "无标签"));
-        rsEventList.add(new RsEvent("第二条事件", "无标签"));
-        rsEventList.add(new RsEvent("第三条事件", "无标签"));
+        rsEventList.add(new RsEvent("第一条事件", "无标签",user));
+        rsEventList.add(new RsEvent("第二条事件", "无标签",user));
+        rsEventList.add(new RsEvent("第三条事件", "无标签",user));
         return rsEventList;
     }
 
@@ -58,9 +60,6 @@ public class RsController {
         }
         rsList.set(index,rsEvent);
 
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        RsEvent event =  objectMapper.readValue(rsEvent, RsEvent.class);
-//        rsList.add(event);
     }
 
     @DeleteMapping("/rs/delete")
