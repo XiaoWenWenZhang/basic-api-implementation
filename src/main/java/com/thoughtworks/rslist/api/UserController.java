@@ -3,11 +3,11 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -26,7 +26,10 @@ public class UserController {
     }
     @PostMapping("/user")
     public ResponseEntity addUser(@RequestBody @Valid User user) {
-
+        if(user.getName().length()>8) throw new RsEventNotValidException("invalid user");
+        if(user.getAge()<18||user.getAge()>100) throw new RsEventNotValidException("invalid user");
+        if(user.getEmail().matches("^[a-z0-9A-Z]+[- | a-z0-9A-Z . _]+@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\\\.)+[a-z]{2,}$")) throw new RsEventNotValidException("invalid user");
+        if(user.getPhone().matches("1\\d{10}")) throw new RsEventNotValidException("invalid user");
         userList.add(user);
         return ResponseEntity.created(null).header("index",String.valueOf(userList.indexOf(user))).build();
     }
@@ -46,6 +49,19 @@ public class UserController {
             userStringList.add(objectMapper.writeValueAsString(user));
         }
         return ResponseEntity.ok(userStringList);
+    }
+
+    @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
+    public ResponseEntity rsExceptionHandler(Exception e) {
+        String errorMessage;
+        if (e instanceof MethodArgumentNotValidException) {
+            errorMessage = "invalid user";
+        } else {
+            errorMessage = e.getMessage();
+        }
+        Error error = new Error();
+        error.setError(errorMessage);
+        return ResponseEntity.badRequest().body(error);
     }
 
 }
