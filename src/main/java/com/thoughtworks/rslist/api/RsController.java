@@ -41,26 +41,15 @@ public class RsController {
         rsList.add(event);
     }
 
-    @PatchMapping("/rs/update")
-    public void updateRsEvent(@RequestParam Integer index, @RequestParam(required = false) String eventName, @RequestParam(required = false) String keyword) {
+    @PatchMapping("/rs/update/{index}")
+    public void updateRsEvent(@PathVariable Integer index, @RequestBody RsEvent rsEvent) {
         RsEvent event = rsList.get(index);
-        RsEvent rsEvent = new RsEvent();
-        if (eventName == null || keyword == null) {
-            if (eventName == null && keyword == null) rsEvent = event;
-            if (eventName == null) {
-                rsEvent = new RsEvent(event.getEventName(), keyword);
-            }
-            if (keyword == null) {
-                rsEvent = new RsEvent(eventName, event.getKeyWord());
-            }
-        } else {
-            rsEvent = new RsEvent(eventName, keyword);
+        if(rsEvent.getEventName()!=null){
+            event.setEventName(rsEvent.getEventName());
         }
-        rsList.set(index,rsEvent);
-
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        RsEvent event =  objectMapper.readValue(rsEvent, RsEvent.class);
-//        rsList.add(event);
+        if(rsEvent.getKeyWord()!=null){
+            event.setKeyWord(rsEvent.getKeyWord());
+        }
     }
 
     @DeleteMapping("/rs/delete")
