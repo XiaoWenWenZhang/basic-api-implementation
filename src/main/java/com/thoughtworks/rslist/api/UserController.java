@@ -2,8 +2,11 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.UserRepository;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.po.UserPO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -11,11 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
     //List<User> userList = new ArrayList<>();
     private List<User> userList = initUserList();
+    @Autowired
+    UserRepository userRepository;
+
 
         private List<User> initUserList() {
         List<User> rsUserList = new ArrayList<>();
@@ -25,8 +32,30 @@ public class UserController {
     }
     @PostMapping("/user")
     public ResponseEntity addUser(@RequestBody @Valid User user) {
+        UserPO userPO = new UserPO();
+        userPO.setAge(user.getAge());
+        userPO.setEmail(user.getEmail());
+        userPO.setGender(user.getGender());
+        userPO.setName(user.getName());
+        userPO.setPhone(user.getPhone());
+        userPO.setVoteNumber(user.getVoteNumber());
+        userRepository.save(userPO);
         userList.add(user);
-        return ResponseEntity.created(null).header("index",String.valueOf(userList.indexOf(user))).build();
+        return ResponseEntity.created(null).header("index", String.valueOf(userList.indexOf(user))).build();
+//        userList.add(user);
+//        return ResponseEntity.created(null).header("index",String.valueOf(userList.indexOf(user))).build();
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity getUserById(@PathVariable int id) {
+        Optional<UserPO> byId = userRepository.findById(id);
+        return ResponseEntity.ok(byId);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity deleteUser(@PathVariable int id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/user")
