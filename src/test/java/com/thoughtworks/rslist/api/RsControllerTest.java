@@ -3,6 +3,10 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.RsEventPO;
+import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,8 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RsControllerTest {
     @Autowired
     MockMvc mockMvc;
+    @Autowired
+    RsEventRepository rsEventRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     public void should_get_rs_event_list() throws Exception {
@@ -93,36 +105,31 @@ class RsControllerTest {
 
     @Test
     public void should_add_rs_event() throws Exception {
-        //  String jsonString = "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\"}";
-        User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
+        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
+                .gender("male").phone("18888888888").name("amy").voteNumber(10).id(30).build();
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", userPO.getId());
+        UserPO savedUser = userRepository.save(userPO);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
-
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
+        List<RsEventPO> rsEvents = rsEventRepository.findAll();
 
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[1].eventName", is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord", is("无标签")))
-                .andExpect(jsonPath("$[3].eventName", is("猪肉涨价了")))
-                .andExpect(jsonPath("$[3].keyWord", is("经济")))
-                .andExpect(status().isOk());
+        assertNotNull(rsEvent);
+        assertEquals(1,rsEvents.size());
+        assertEquals("猪肉涨价了",rsEvents.get(0).getEventName());
+        assertEquals("经济",rsEvents.get(0).getKeyWord());
+        assertEquals(savedUser.getId(),rsEvents.get(0).getUserId());
 
     }
 
     @Test
     public void should_update_rs_event() throws Exception {
         User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
-        RsEvent rsEvent1 = new RsEvent("牛肉涨价了", null, user);
-        RsEvent rsEvent2 = new RsEvent("小学生放假了", "社会时事", user);
-        RsEvent rsEvent3 = new RsEvent(null, "政治", user);
+        RsEvent rsEvent1 = new RsEvent("牛肉涨价了", null, 44);
+        RsEvent rsEvent2 = new RsEvent("小学生放假了", "社会时事", 55);
+        RsEvent rsEvent3 = new RsEvent(null, "政治", 66);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString1 = objectMapper.writeValueAsString(rsEvent1);
         String jsonString2 = objectMapper.writeValueAsString(rsEvent2);
@@ -176,7 +183,7 @@ class RsControllerTest {
     @Test
     public void should_throw_method_argument_not_valid_exception() throws Exception {
         User user = new User("xiaowangwang", "famale", 19, "a@thoughtworks.com", "18888888888");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", user);
+        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", 77);
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
