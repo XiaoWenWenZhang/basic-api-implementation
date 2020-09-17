@@ -5,6 +5,7 @@ import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.po.RsEventPO;
+import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,12 @@ public class RsController {
 
     private List<RsEvent> initRsEventList() {
         User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
+        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
+                .gender("male").phone("18888888888").name("amy").voteNumber(10).build();
         List<RsEvent> rsEventList = new ArrayList<>();
-        rsEventList.add(new RsEvent("第一条事件", "无标签", 1));
-        rsEventList.add(new RsEvent("第二条事件", "无标签", 2));
-        rsEventList.add(new RsEvent("第三条事件", "无标签", 3));
+        rsEventList.add(new RsEvent("第一条事件", "无标签", userPO));
+        rsEventList.add(new RsEvent("第二条事件", "无标签", userPO));
+        rsEventList.add(new RsEvent("第三条事件", "无标签", userPO));
         return rsEventList;
     }
 
@@ -65,13 +68,12 @@ public class RsController {
 
     @PostMapping("/rs/event")
     public ResponseEntity addRsEvent(@RequestBody @Validated RsEvent rsEvent) throws IOException {
-        if (!userRepository.findById(rsEvent.getUserId()).isPresent()) {
+        if (!userRepository.findById(rsEvent.getUserPO().getId()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord())
-                .userId(rsEvent.getUserId()).build();
+        RsEventPO rsEventPO = RsEventPO.builder().eventName(rsEvent.getEventName()).keyWord(rsEvent.getKeyWord()).userPO(rsEvent.getUserPO()).build();
         rsEventRepository.save(rsEventPO);
-        return ResponseEntity.created(null).header("index", String.valueOf(rsEvent.getUserId())).build();
+        return ResponseEntity.created(null).header("index", String.valueOf(rsEvent.getUserPO().getId())).build();
 //        User rsUser = rsEvent.getUser();
 //        for (int i = 0; i < userList.size(); i++) {
 //            if (!userList.get(i).getName().equals(rsUser.getName())) {
@@ -95,8 +97,8 @@ public class RsController {
     }
 
     @DeleteMapping("/rs/delete")
-    public ResponseEntity deleteRsEvent(@RequestParam int index) {
-        rsList.remove(index);
+    public ResponseEntity deleteRsEvent(@RequestParam int id) {
+        rsEventRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Builder
 @Data
@@ -15,7 +16,7 @@ import javax.persistence.*;
 @Table(name = "user")
 public class UserPO {
     @Id
-  //  @GeneratedValue
+    @GeneratedValue
     private int id;
     @Column(name = "name")
     private String name;
@@ -24,4 +25,8 @@ public class UserPO {
     private String email;
     private String phone;
     private int voteNumber = 10;
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "userPO")
+    private List<RsEventPO> rsEventPOs;
+    //总结：mappedBy 和@JoinTable or @JoinColumn是互斥的，不能在一起使用。
 }

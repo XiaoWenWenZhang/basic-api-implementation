@@ -2,7 +2,9 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +31,13 @@ class UserControllerTest {
     MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userRepository.deleteAll();
+        rsEventRepository.deleteAll();
     }
 
     @Test
@@ -59,9 +64,9 @@ class UserControllerTest {
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         List<UserPO> userRepositoryAll = userRepository.findAll();
-        assertEquals(1,userRepositoryAll.size());
-        assertEquals("xiaowang",userRepositoryAll.get(0).getName());
-        assertEquals("a@thoughtworks.com",userRepositoryAll.get(0).getEmail());
+        assertEquals(1, userRepositoryAll.size());
+        assertEquals("xiaowang", userRepositoryAll.get(0).getName());
+        assertEquals("a@thoughtworks.com", userRepositoryAll.get(0).getEmail());
     }
 
     @Test
@@ -70,22 +75,25 @@ class UserControllerTest {
                 .gender("male").phone("18888888888").name("amy").voteNumber(10).id(3).build());
         mockMvc.perform(get("/user/3"))
                 .andExpect(jsonPath("$.name", is("amy")))
-                .andExpect(jsonPath("$.age",is(30)))
-                .andExpect(jsonPath("$.email",is("a@thoughtworks.com")))
-                .andExpect(jsonPath("$.gender",is("male")))
-                .andExpect(jsonPath("$.phone",is("18888888888")))
-                .andExpect(jsonPath("$.voteNumber",is(10)))
+                .andExpect(jsonPath("$.age", is(30)))
+                .andExpect(jsonPath("$.email", is("a@thoughtworks.com")))
+                .andExpect(jsonPath("$.gender", is("male")))
+                .andExpect(jsonPath("$.phone", is("18888888888")))
+                .andExpect(jsonPath("$.voteNumber", is(10)))
                 .andExpect(status().isOk());
 
     }
 
     @Test
     public void should_delete_user_when_give_id() throws Exception {
-        userRepository.save(UserPO.builder().age(30).email("a@thoughtworks.com")
-                .gender("male").phone("18888888888").name("amy").voteNumber(10).id(13).build());
-        mockMvc.perform(delete("/user/13"));
-        List<UserPO> userRepositoryAll = userRepository.findAll();
-        assertEquals(0,userRepositoryAll.size());
+        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
+                .gender("male").phone("18888888888").name("amy").voteNumber(10).build();
+        userRepository.save(userPO);
+        RsEventPO rsEventPO = RsEventPO.builder().keyWord("经济").eventName("涨工资了").userPO(userPO).build();
+        rsEventRepository.save(rsEventPO);
+        mockMvc.perform(delete("/user/{id}",userPO.getId()));
+        assertEquals(0, userRepository.findAll().size());
+        assertEquals(0, rsEventRepository.findAll().size());
     }
 
     @Test
