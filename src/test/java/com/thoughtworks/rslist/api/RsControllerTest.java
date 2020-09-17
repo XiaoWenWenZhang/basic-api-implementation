@@ -124,38 +124,38 @@ class RsControllerTest {
 
     }
 
-    @Test
-    public void should_update_rs_event() throws Exception {
-        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
-            .gender("male").phone("18888888888").name("amy").voteNumber(10).id(30).build();
-        RsEvent rsEvent1 = new RsEvent("牛肉涨价了", null, userPO);
-        RsEvent rsEvent2 = new RsEvent("小学生放假了", "社会时事", userPO);
-        RsEvent rsEvent3 = new RsEvent(null, "政治", userPO);
-
-        String jsonString1 = "{\"eventName\":\"牛肉涨价了\",\"keyWord\":null,\"userId\":1}";
-        String jsonString2 = "{\"eventName\":\"小学生放假了\",\"keyWord\":\"社会时事\",\"userId\":2}";
-        String jsonString3 = "{\"eventName\":null,\"keyWord\":\"政治\",\"userId\":3}";
-
-        mockMvc.perform(patch("/rs/update/0").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(patch("/rs/update/1").content(jsonString2).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(patch("/rs/update/2").content(jsonString3).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
+//    @Test
+//    public void should_update_rs_event() throws Exception {
+//        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
+//            .gender("male").phone("18888888888").name("amy").voteNumber(10).id(30).build();
+//        RsEvent rsEvent1 = new RsEvent("牛肉涨价了", null, userPO);
+//        RsEvent rsEvent2 = new RsEvent("小学生放假了", "社会时事", userPO);
+//        RsEvent rsEvent3 = new RsEvent(null, "政治", userPO);
 //
-//        mockMvc.perform(get("/rs/list"))
-//                .andExpect(jsonPath("$", hasSize(3)))
-//                .andExpect(jsonPath("$[0].eventName", is("牛肉涨价了")))
-//                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-//                .andExpect(jsonPath("$[1].eventName", is("小学生放假了")))
-//                .andExpect(jsonPath("$[1].keyWord", is("社会时事")))
-//                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-//                .andExpect(jsonPath("$[2].keyWord", is("政治")))
+//        String jsonString1 = "{\"eventName\":\"牛肉涨价了\",\"keyWord\":null,\"userId\":1}";
+//        String jsonString2 = "{\"eventName\":\"小学生放假了\",\"keyWord\":\"社会时事\",\"userId\":2}";
+//        String jsonString3 = "{\"eventName\":null,\"keyWord\":\"政治\",\"userId\":3}";
+//
+//        mockMvc.perform(patch("/rs/update/0").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isOk());
-
-
-    }
+//        mockMvc.perform(patch("/rs/update/1").content(jsonString2).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//        mockMvc.perform(patch("/rs/update/2").content(jsonString3).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//
+////
+////        mockMvc.perform(get("/rs/list"))
+////                .andExpect(jsonPath("$", hasSize(3)))
+////                .andExpect(jsonPath("$[0].eventName", is("牛肉涨价了")))
+////                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
+////                .andExpect(jsonPath("$[1].eventName", is("小学生放假了")))
+////                .andExpect(jsonPath("$[1].keyWord", is("社会时事")))
+////                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
+////                .andExpect(jsonPath("$[2].keyWord", is("政治")))
+////                .andExpect(status().isOk());
+//
+//
+//    }
 
     @Test
     public void should_delete_rs_event() throws Exception {
