@@ -1,7 +1,5 @@
 package com.thoughtworks.rslist.domain;
 
-import com.thoughtworks.rslist.po.UserPO;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -13,8 +11,15 @@ public class RsEvent {
     private String keyWord;
     @Valid
     @NotNull
-    private UserPO userPO;
+    private int userId;
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 ////    @JsonIgnore
 //    public User getUser() {
 //        return user;
@@ -30,18 +35,10 @@ public class RsEvent {
     public RsEvent() {
     }
 
-    public UserPO getUserPO() {
-        return userPO;
-    }
-
-    public void setUserPO(UserPO userPO) {
-        this.userPO = userPO;
-    }
-
-    public RsEvent(@NotNull String eventName, @NotNull String keyWord, @Valid @NotNull UserPO userPO) {
+    public RsEvent(@NotNull String eventName, @NotNull String keyWord, @Valid @NotNull int userId) {
         this.eventName = eventName;
         this.keyWord = keyWord;
-        this.userPO = userPO;
+        this.userId = userId;
     }
 
     public String getEventName() {

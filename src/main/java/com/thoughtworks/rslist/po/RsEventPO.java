@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.po;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,5 +21,6 @@ public class RsEventPO {
     private String eventName;
     private String keyWord;
     @ManyToOne
+    @JsonIgnore
     private UserPO userPO;
 }
