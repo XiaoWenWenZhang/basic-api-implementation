@@ -2,7 +2,7 @@ package com.thoughtworks.rslist.component;
 
 //@ControllerAdvice
 public class RsEventHandler {
-//    @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
+//    @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class,IndexOutOfBoundsException.class})
 //    public ResponseEntity rsExceptionHandler(Exception e) {
 //        String errorMessage;
 //        if (e instanceof MethodArgumentNotValidException) {

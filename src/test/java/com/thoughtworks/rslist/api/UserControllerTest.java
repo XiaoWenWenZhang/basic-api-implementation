@@ -10,13 +10,15 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,33 +73,38 @@ class UserControllerTest {
 
     }
 
-//    @Test
-//    @Order(1)
-//    public void should_register_user() throws Exception {
-//        User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated());
-//        List<UserPO> userRepositoryAll = userRepository.findAll();
-//        assertEquals(1, userRepositoryAll.size());
-//        assertEquals("xiaowang", userRepositoryAll.get(0).getName());
-//        assertEquals("a@thoughtworks.com", userRepositoryAll.get(0).getEmail());
-//    }
+    @Test
+    @Order(1)
+    public void should_register_user() throws Exception {
+        User user = new User("lili", "famale", 19, "a@thoughtworks.com", "18888888888");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        List<UserPO> userRepositoryAll = userRepository.findAll();
+        assertEquals(1, userRepositoryAll.size());
+        assertEquals("lili", userRepositoryAll.get(0).getName());
+        assertEquals("a@thoughtworks.com", userRepositoryAll.get(0).getEmail());
+    }
 
     @Test
     public void should_get_user_when_give_id() throws Exception {
-        userRepository.save(UserPO.builder().age(30).email("a@thoughtworks.com")
-                .gender("male").phone("18888888888").name("amy").voteNumber(10).id(3).build());
-        mockMvc.perform(get("/user/3"))
+        userRepository.save(userPO1);
+        mockMvc.perform(get("/user/{id}", userPO1.getId()))
                 .andExpect(jsonPath("$.name", is("amy")))
-                .andExpect(jsonPath("$.age", is(30)))
+                .andExpect(jsonPath("$.age", is(20)))
                 .andExpect(jsonPath("$.email", is("a@thoughtworks.com")))
                 .andExpect(jsonPath("$.gender", is("male")))
                 .andExpect(jsonPath("$.phone", is("18888888888")))
                 .andExpect(jsonPath("$.voteNumber", is(10)))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    public void should_get_user_fail_when_give_id_is_not_exist() throws Exception {
+        userRepository.save(userPO1);
+        mockMvc.perform(get("/user/{id}", userPO2.getId()))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -114,6 +121,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[1]", is(jsonString2)))
                 .andExpect(status().isOk());
     }
+
     @Test
     public void should_delete_user_when_give_id() throws Exception {
         UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
@@ -121,7 +129,7 @@ class UserControllerTest {
         userRepository.save(userPO);
         RsEventPO rsEventPO = RsEventPO.builder().keyWord("经济").eventName("涨工资了").userPO(userPO).build();
         rsEventRepository.save(rsEventPO);
-        mockMvc.perform(delete("/user/{id}",userPO.getId()));
+        mockMvc.perform(delete("/user/{id}", userPO.getId()));
         assertEquals(0, userRepository.findAll().size());
         assertEquals(0, rsEventRepository.findAll().size());
     }
