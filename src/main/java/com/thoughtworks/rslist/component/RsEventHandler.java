@@ -17,7 +17,9 @@ public class RsEventHandler {
         Error error = new Error();
         if (e instanceof MethodArgumentNotValidException && httpServletRequest.getRequestURI().equals("/user")) {
             errorMessage = "invalid user";
-        } else {
+        } else if(e instanceof RsEventNotValidException){
+            errorMessage = e.getMessage();
+        }else {
             errorMessage = "invalid request param";
         }
         error.setError(errorMessage);

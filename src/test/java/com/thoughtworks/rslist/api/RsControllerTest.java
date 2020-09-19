@@ -131,72 +131,60 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void should_throw_exception_when_give_invalid_id() throws Exception {
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        mockMvc.perform(get("/rs/{id}",rsEventPO2.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid index")));
+    }
 
-//    @Test
-//    public void should_update_rs_event() throws Exception {
-//        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
-//            .gender("male").phone("18888888888").name("amy").voteNumber(10).id(30).build();
-//        RsEvent rsEvent1 = new RsEvent("牛肉涨价了", null, userPO);
-//        RsEvent rsEvent2 = new RsEvent("小学生放假了", "社会时事", userPO);
-//        RsEvent rsEvent3 = new RsEvent(null, "政治", userPO);
-//
-//        String jsonString1 = "{\"eventName\":\"牛肉涨价了\",\"keyWord\":null,\"userId\":1}";
-//        String jsonString2 = "{\"eventName\":\"小学生放假了\",\"keyWord\":\"社会时事\",\"userId\":2}";
-//        String jsonString3 = "{\"eventName\":null,\"keyWord\":\"政治\",\"userId\":3}";
-//
-//        mockMvc.perform(patch("/rs/update/0").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//        mockMvc.perform(patch("/rs/update/1").content(jsonString2).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//        mockMvc.perform(patch("/rs/update/2").content(jsonString3).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//
-////
-////        mockMvc.perform(get("/rs/list"))
-////                .andExpect(jsonPath("$", hasSize(3)))
-////                .andExpect(jsonPath("$[0].eventName", is("牛肉涨价了")))
-////                .andExpect(jsonPath("$[0].keyWord", is("无标签")))
-////                .andExpect(jsonPath("$[1].eventName", is("小学生放假了")))
-////                .andExpect(jsonPath("$[1].keyWord", is("社会时事")))
-////                .andExpect(jsonPath("$[2].eventName", is("第三条事件")))
-////                .andExpect(jsonPath("$[2].keyWord", is("政治")))
-////                .andExpect(status().isOk());
-//
-//
-//    }
+    @Test
+    public void should_update_when_userId_match_user() throws Exception {
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        String jsonString = "{\"eventName\":\"高校开学了\",\"keyWord\":\"学生\",\"userId\":"+userPO1.getId()+"}";
+        mockMvc.perform(patch("/rs/update/{id}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        List<RsEventPO> rsEventPOS = rsEventRepository.findAll();
+        assertEquals("高校开学了",rsEventPOS.get(0).getEventName());
+        assertEquals("学生",rsEventPOS.get(0).getKeyWord());
+    }
+
+    @Test
+    public void should_update_when_userId_not_match_user() throws Exception {
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        String jsonString = "{\"eventName\":\"高校开学了\",\"keyWord\":\"学生\",\"userId\":"+userPO2.getId()+"}";
+        mockMvc.perform(patch("/rs/update/{id}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void should_only_update_keyWord_when_only_give_keyWord() throws Exception {
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        String jsonString = "{\"eventName\":null,\"keyWord\":\"气温\",\"userId\":"+userPO1.getId()+"}";
+        mockMvc.perform(patch("/rs/update/{id}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        List<RsEventPO> rsEventPOS = rsEventRepository.findAll();
+        assertEquals("小学生放假了",rsEventPOS.get(0).getEventName());
+        assertEquals("气温",rsEventPOS.get(0).getKeyWord());
+    }
 
 
-
-//    @Test
-//    public void should_throw_rs_event_not_valid_exception() throws Exception {
-//
-//        mockMvc.perform(get("/rs/{id}",))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.error", is("invalid index")));
-//    }
-//
-//    @Test
-//    public void should_throw_start_or_end_out_of_range_exception() throws Exception {
-//        mockMvc.perform(get("/rs/list?start=0&end=1"))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.error", is("invalid request param")));
-//    }
-//
-//    @Test
-//    public void should_throw_method_argument_not_valid_exception() throws Exception {
-//        User user = new User("xiaowangwang", "famale", 19, "a@thoughtworks.com", "18888888888");
-//        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
-//                .gender("male").phone("18888888888").name("amy").voteNumber(10).id(30).build();
-//        RsEvent rsEvent = new RsEvent("猪肉涨价了", "经济", userPO);
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(rsEvent);
-//
-//        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.error", is("invalid param")));
-//
-//    }
+    @Test
+    public void should_only_update_eventName_when_only_give_eventName() throws Exception {
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        String jsonString = "{\"eventName\":\"牛肉涨价了\",\"keyWord\":null,\"userId\":"+userPO1.getId()+"}";
+        mockMvc.perform(patch("/rs/update/{id}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        List<RsEventPO> rsEventPOS = rsEventRepository.findAll();
+        assertEquals("牛肉涨价了",rsEventPOS.get(0).getEventName());
+        assertEquals("社会时事",rsEventPOS.get(0).getKeyWord());
+    }
 
 
 }

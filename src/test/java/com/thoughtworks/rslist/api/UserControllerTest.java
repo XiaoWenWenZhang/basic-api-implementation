@@ -111,7 +111,9 @@ class UserControllerTest {
     public void should_get_user_fail_when_give_id_is_not_exist() throws Exception {
         userRepository.save(userPO1);
         mockMvc.perform(get("/user/{id}", userPO2.getId()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid index")));
+
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
@@ -37,7 +38,7 @@ public class UserController {
     @GetMapping("/user/{id}")
     public ResponseEntity<Optional<UserPO>> getUserById(@PathVariable int id) {
         Optional<UserPO> userPO = userRepository.findById(id);
-        if (!userPO.isPresent()) return ResponseEntity.badRequest().build();
+        if (!userPO.isPresent()) throw new RsEventNotValidException("invalid index");
         return ResponseEntity.ok(userPO);
     }
 

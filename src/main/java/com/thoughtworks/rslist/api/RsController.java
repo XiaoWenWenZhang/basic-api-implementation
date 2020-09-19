@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
@@ -23,8 +24,10 @@ public class RsController {
     UserRepository userRepository;
 
     @GetMapping("/rs/{id}")
-    public ResponseEntity getOneRsEvent(@PathVariable int id) {
-        return ResponseEntity.ok(rsEventRepository.findById(id));
+    public ResponseEntity<Optional<RsEventPO>> getOneRsEvent(@PathVariable int id) {
+        Optional<RsEventPO> rsEventPO = rsEventRepository.findById(id);
+        if(!rsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
+        return ResponseEntity.ok(rsEventPO);
     }
 
     @GetMapping("/rs/list")
@@ -33,7 +36,7 @@ public class RsController {
     }
 
     @PostMapping("/rs/event")
-    public ResponseEntity addRsEvent(@RequestBody @Validated RsEvent rsEvent) throws IOException {
+    public ResponseEntity<Void> addRsEvent(@RequestBody @Validated RsEvent rsEvent) throws IOException {
         Optional<UserPO> userPO = userRepository.findById(rsEvent.getUserId());
 
         if (!userPO.isPresent()) {
@@ -56,31 +59,23 @@ public class RsController {
 
 
 
-//    @PatchMapping("/rs/update/{index}")
-//    public ResponseEntity updateRsEvent(@PathVariable Integer index, @RequestBody RsEvent rsEvent) {
-//        RsEvent event = rsList.get(index);
-//        if (rsEvent.getEventName() != null) {
-//            event.setEventName(rsEvent.getEventName());
-//        }
-//        if (rsEvent.getKeyWord() != null) {
-//            event.setKeyWord(rsEvent.getKeyWord());
-//        }
-//        return ResponseEntity.ok().build();
-//    }
+    @PatchMapping("/rs/update/{id}")
+    public ResponseEntity<Void> updateRsEvent(@PathVariable int id, @RequestBody RsEvent rsEvent) {
+        Optional<RsEventPO> currentRsEventPO = rsEventRepository.findById(id);
+        if(!currentRsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
+        if(currentRsEventPO.get().getUserPO().getId()!=rsEvent.getUserId()){
+            return ResponseEntity.badRequest().build();
+        }
+        rsEventRepository.deleteById(id);
+        if (rsEvent.getEventName() != null) {
+            currentRsEventPO.get().setEventName(rsEvent.getEventName());
+        }
+        if (rsEvent.getKeyWord() != null) {
+            currentRsEventPO.get().setKeyWord(rsEvent.getKeyWord());
+        }
+        rsEventRepository.save(currentRsEventPO.get());
+        return ResponseEntity.ok().build();
+    }
 
 
-//
-//    @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
-//    public ResponseEntity rsExceptionHandler(Exception e) {
-//        String errorMessage;
-//        if (e instanceof MethodArgumentNotValidException) {
-//            errorMessage = "invalid param";
-//        } else {
-//            errorMessage = e.getMessage();
-//        }
-//        Error error = new Error();
-//        error.setError(errorMessage);
-//        return ResponseEntity.badRequest().body(error);
-//    }
-//
 }
