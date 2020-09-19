@@ -5,22 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RsEvent {
-    @NotNull
-    private String eventName;
-    @NotNull
-    private String keyWord;
-    @Valid
-    @NotNull
-    private int userId;
+public class Vote {
     private int voteNum;
-
+    private int userId;
+    private int rsEventId;
+    private LocalDateTime voteTime;
 
 }

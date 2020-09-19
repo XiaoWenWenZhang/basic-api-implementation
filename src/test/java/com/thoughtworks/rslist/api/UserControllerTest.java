@@ -155,7 +155,7 @@ class UserControllerTest {
     @Order(7)
     public void should_age_between_18_and_100() throws Exception {
         User user = new User("xiaowang", "famale", 10, "a@thoughtworks.com", "18888888888");
-        String jsonString = objectMapper.writeValueAsString(user);
+                String jsonString = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid user")));

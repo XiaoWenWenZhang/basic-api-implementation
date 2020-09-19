@@ -26,7 +26,7 @@ public class RsController {
     @GetMapping("/rs/{id}")
     public ResponseEntity<Optional<RsEventPO>> getOneRsEvent(@PathVariable int id) {
         Optional<RsEventPO> rsEventPO = rsEventRepository.findById(id);
-        if(!rsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
+        if (!rsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
         return ResponseEntity.ok(rsEventPO);
     }
 
@@ -58,12 +58,11 @@ public class RsController {
     }
 
 
-
     @PatchMapping("/rs/update/{id}")
     public ResponseEntity<Void> updateRsEvent(@PathVariable int id, @RequestBody RsEvent rsEvent) {
         Optional<RsEventPO> currentRsEventPO = rsEventRepository.findById(id);
-        if(!currentRsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
-        if(currentRsEventPO.get().getUserPO().getId()!=rsEvent.getUserId()){
+        if (!currentRsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
+        if (currentRsEventPO.get().getUserPO().getId() != rsEvent.getUserId()) {
             return ResponseEntity.badRequest().build();
         }
         rsEventRepository.deleteById(id);
@@ -76,6 +75,22 @@ public class RsController {
         rsEventRepository.save(currentRsEventPO.get());
         return ResponseEntity.ok().build();
     }
+
+//    @PostMapping("/rs/vote/{rsEventId}")
+//    public ResponseEntity<Void> addVoteByRsEventId(@PathVariable int rsEventId, @RequestBody Vote vote) {
+//        Optional<RsEventPO> OptionalRsEventPO = rsEventRepository.findById(rsEventId);
+//        RsEventPO rsEventPO =OptionalRsEventPO.get();
+//        UserPO userPO = rsEventPO.getUserPO();
+//        if (!OptionalRsEventPO.isPresent()) throw new RsEventNotValidException("invalid index");
+//        if (userPO.getVoteNumber()<vote.getVoteNum()) return ResponseEntity.badRequest().build();
+//        userPO.setVoteNumber(userPO.getVoteNumber()-vote.getVoteNum());
+//        rsEventPO.setVoteNum(vote.getVoteNum());
+//        rsEventRepository.deleteById(rsEventId);
+//        rsEventRepository.save(rsEventPO);
+//        userRepository.deleteById(userPO.getId());
+//        userRepository.save(userPO);
+//        return ResponseEntity.created(null).build();
+//    }
 
 
 }

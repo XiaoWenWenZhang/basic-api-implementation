@@ -101,7 +101,7 @@ class RsControllerTest {
     @Test
     public void should_add_rs_event_when_user_exist() throws Exception {
         userRepository.save(userPO1);
-        RsEvent rsEvent = new RsEvent("降温了", "天气", userPO1.getId());
+        RsEvent rsEvent = new RsEvent("降温了", "天气", userPO1.getId(),0);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -115,7 +115,7 @@ class RsControllerTest {
     @Test
     public void should_add_rs_event_fail_when_user_not_exist() throws Exception {
 //        userRepository.save(userPO1);
-        RsEvent rsEvent = new RsEvent("降温了", "天气", userPO1.getId());
+        RsEvent rsEvent = new RsEvent("降温了", "天气", userPO1.getId(),0);
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -185,6 +185,23 @@ class RsControllerTest {
         assertEquals("牛肉涨价了",rsEventPOS.get(0).getEventName());
         assertEquals("社会时事",rsEventPOS.get(0).getKeyWord());
     }
+
+//    @Test
+//    public void should_vote_rs_event_when_give_id() throws Exception {
+//        userRepository.save(userPO1);
+//        rsEventRepository.save(rsEventPO1);
+//        Vote vote = Vote.builder()
+//                .userId(userPO1.getId())
+//                .rsEventId(rsEventPO1.getId())
+//                .voteNum(3)
+//                .voteTime(LocalDateTime.of(2020, 9, 18, 23, 50))
+//                .build();
+//        String jsonString= objectMapper.writeValueAsString(vote);
+//        mockMvc.perform(post("/rs/vote/{rsEventId}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isCreated());
+//        assertEquals(3,rsEventRepository.findById(rsEventPO1.getId()).get().getVoteNum());
+//        assertEquals(7,userRepository.findById(userPO1.getId()).get().getVoteNumber());
+//    }
 
 
 }
