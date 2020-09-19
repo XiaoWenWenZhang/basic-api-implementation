@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,7 +19,6 @@ public class UserController {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
-
 
 
     @PostMapping("/user")
@@ -37,39 +37,25 @@ public class UserController {
     @GetMapping("/user/{id}")
     public ResponseEntity<Optional<UserPO>> getUserById(@PathVariable int id) {
         Optional<UserPO> userPO = userRepository.findById(id);
-        if(!userPO.isPresent()) throw new RuntimeException("user id is not exist");
+        if (!userPO.isPresent()) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(userPO);
     }
-//
-//    @DeleteMapping("/user/{id}")
-//    public ResponseEntity deleteUser(@PathVariable int id) {
-//        userRepository.deleteById(id);
-////        rsEventRepository.deleteAllByUserId(id);
-//        return ResponseEntity.ok().build();
-//    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserPO>> getUsers() {
+        return ResponseEntity.ok(userRepository.findAll());
+    }
 
 
 
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity deleteUser(@PathVariable int id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 
 
 
-
-//    @GetMapping("/user")
-//    public ResponseEntity<List<User>> getUserList() {
-//
-//        return ResponseEntity.ok(userList);
-//    }
-
-//    @GetMapping("/users")
-//    public ResponseEntity getUsers() throws JsonProcessingException {
-//        List<String> userStringList = new ArrayList<>();
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        for(int i=0;i<userList.size();i++){
-//            User user = userList.get(i);
-//            userStringList.add(objectMapper.writeValueAsString(user));
-//        }
-//        return ResponseEntity.ok(userStringList);
-//    }
 
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
 //    public ResponseEntity rsExceptionHandler(Exception e) {
@@ -79,7 +65,6 @@ public class UserController {
 //    }
 
 }
-
 
 
 

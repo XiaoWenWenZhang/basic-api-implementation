@@ -166,10 +166,11 @@ class RsControllerTest {
 //    }
 
 
-//
+
 //    @Test
 //    public void should_throw_rs_event_not_valid_exception() throws Exception {
-//        mockMvc.perform(get("/rs/0"))
+//
+//        mockMvc.perform(get("/rs/{id}",))
 //                .andExpect(status().isBadRequest())
 //                .andExpect(jsonPath("$.error", is("invalid index")));
 //    }

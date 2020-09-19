@@ -37,6 +37,7 @@ class UserControllerTest {
     UserPO userPO2;
     RsEventPO rsEventPO1;
     RsEventPO rsEventPO2;
+    RsEventPO rsEventPO3;
     ObjectMapper objectMapper;
 
     @BeforeEach
@@ -69,6 +70,11 @@ class UserControllerTest {
                 .keyWord("经济")
                 .userPO(userPO2)
                 .build();
+        rsEventPO3 = RsEventPO.builder()
+                .eventName("天冷了")
+                .keyWord("天气")
+                .userPO(userPO1)
+                .build();
         objectMapper = new ObjectMapper();
 
     }
@@ -77,7 +83,6 @@ class UserControllerTest {
     @Order(1)
     public void should_register_user() throws Exception {
         User user = new User("lili", "famale", 19, "a@thoughtworks.com", "18888888888");
-        ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -88,6 +93,7 @@ class UserControllerTest {
     }
 
     @Test
+    @Order(2)
     public void should_get_user_when_give_id() throws Exception {
         userRepository.save(userPO1);
         mockMvc.perform(get("/user/{id}", userPO1.getId()))
@@ -101,93 +107,79 @@ class UserControllerTest {
     }
 
     @Test
+    @Order(3)
     public void should_get_user_fail_when_give_id_is_not_exist() throws Exception {
         userRepository.save(userPO1);
         mockMvc.perform(get("/user/{id}", userPO2.getId()))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    @Order(6)
+    @Order(4)
     public void should_get_users() throws Exception {
-        User user1 = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "18888888888");
-        User user2 = new User("wendy", "male", 30, "a@thoughtworks.com", "18888888888");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString1 = objectMapper.writeValueAsString(user1);
-        String jsonString2 = objectMapper.writeValueAsString(user2);
+        userRepository.save(userPO1);
+        userRepository.save(userPO2);
         mockMvc.perform(get("/users"))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0]", is(jsonString1)))
-                .andExpect(jsonPath("$[1]", is(jsonString2)))
+                .andExpect(jsonPath("$[0].age", is(20)))
+                .andExpect(jsonPath("$[0].name", is("amy")))
+                .andExpect(jsonPath("$[1].gender", is("female")))
+                .andExpect(jsonPath("$[1].email", is("a@b.com")))
                 .andExpect(status().isOk());
     }
 
     @Test
+    @Order(5)
     public void should_delete_user_when_give_id() throws Exception {
-        UserPO userPO = UserPO.builder().age(30).email("a@thoughtworks.com")
-                .gender("male").phone("18888888888").name("amy").voteNumber(10).build();
-        userRepository.save(userPO);
-        RsEventPO rsEventPO = RsEventPO.builder().keyWord("经济").eventName("涨工资了").userPO(userPO).build();
-        rsEventRepository.save(rsEventPO);
-        mockMvc.perform(delete("/user/{id}", userPO.getId()));
+        userRepository.save(userPO1);
+        rsEventRepository.save(rsEventPO1);
+        rsEventRepository.save(rsEventPO3);
+        mockMvc.perform(delete("/user/{id}", userPO1.getId()));
         assertEquals(0, userRepository.findAll().size());
         assertEquals(0, rsEventRepository.findAll().size());
     }
 
-//    @Test
-//    @Order(2)
-//    public void should_name_suit_format() throws Exception {
-//        User user = new User("xiaowangwang", "famale", 19, "a@thoughtworks.com", "18888888888");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//    @Test
-//    @Order(3)
-//    public void should_age_between_18_and_100() throws Exception {
-//        User user = new User("xiaowang", "famale", 10, "a@thoughtworks.com", "18888888888");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//    @Test
-//    @Order(4)
-//    public void should_email_suit_format() throws Exception {
-//        User user = new User("xiaowang", "famale", 19, "thoughtworks.com", "18888888888");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//    @Test
-//    @Order(5)
-//    public void should_phone_suit_format() throws Exception {
-//        User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "1888888888899");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//
-//
-//
-//    @Test
-//    @Order(7)
-//    public void should_throw_rs_user_not_valid_exception() throws Exception {
-//        User user = new User("xiaowangwang", "famale", 19, "a@thoughtworks.com", "18888888888");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String jsonString = objectMapper.writeValueAsString(user);
-//        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.error", is("invalid user")));
-//
-//    }
+    @Test
+    @Order(6)
+    public void should_name_suit_format() throws Exception {
+        User user = new User("xiaowangwang", "famale", 19, "a@thoughtworks.com", "18888888888");
+        String jsonString = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+    }
+
+    @Test
+    @Order(7)
+    public void should_age_between_18_and_100() throws Exception {
+        User user = new User("xiaowang", "famale", 10, "a@thoughtworks.com", "18888888888");
+        String jsonString = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+    }
+
+    @Test
+    @Order(8)
+    public void should_email_suit_format() throws Exception {
+        User user = new User("xiaowang", "famale", 19, "thoughtworks.com", "18888888888");
+        String jsonString = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+    }
+
+    @Test
+    @Order(9)
+    public void should_phone_suit_format() throws Exception {
+        User user = new User("xiaowang", "famale", 19, "a@thoughtworks.com", "1888888888899");
+        String jsonString = objectMapper.writeValueAsString(user);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+    }
+
+
 
 
 }
