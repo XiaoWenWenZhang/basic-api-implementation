@@ -8,13 +8,16 @@ import com.thoughtworks.rslist.po.VotePO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class RsService {
     final UserRepository userRepository;
     final RsEventRepository rsEventRepository;
     final VoteRepository voteRepository;
+
 
     public RsService(UserRepository userRepository, RsEventRepository rsEventRepository, VoteRepository voteRepository) {
         this.userRepository = userRepository;
@@ -22,8 +25,10 @@ public class RsService {
         this.voteRepository = voteRepository;
     }
 
+
+
     public void vote(int rsEventId, Vote vote) {
-        Optional<RsEventPO> rsEventPO= rsEventRepository.findById(rsEventId);
+        Optional<RsEventPO> rsEventPO = rsEventRepository.findById(rsEventId);
         Optional<UserPO> userPO = userRepository.findById(vote.getUserId());
         if (!rsEventPO.isPresent() || !userPO.isPresent()
                 || vote.getVoteNum() > userPO.get().getVoteNumber()) {
@@ -38,10 +43,10 @@ public class RsService {
                         .build();
         voteRepository.save(votePo);
         UserPO newUserPo = userPO.get();
-        newUserPo.setVoteNumber(newUserPo.getVoteNumber()-vote.getVoteNum());
+        newUserPo.setVoteNumber(newUserPo.getVoteNumber() - vote.getVoteNum());
         userRepository.save(newUserPo);
         RsEventPO newRsEventPo = rsEventPO.get();
-        newRsEventPo.setVoteNum(newRsEventPo.getVoteNum()+vote.getVoteNum());
+        newRsEventPo.setVoteNum(newRsEventPo.getVoteNum() + vote.getVoteNum());
         rsEventRepository.save(newRsEventPo);
     }
 }

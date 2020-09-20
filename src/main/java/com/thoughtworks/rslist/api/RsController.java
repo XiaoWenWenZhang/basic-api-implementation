@@ -18,13 +18,13 @@ import java.util.Optional;
 
 @RestController
 public class RsController {
-
-    @Autowired
-    RsEventRepository rsEventRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
+    RsEventRepository rsEventRepository;
+    @Autowired
     VoteRepository voteRepository;
+
 
     @GetMapping("/rs/{id}")
     public ResponseEntity<Optional<RsEventPO>> getOneRsEvent(@PathVariable int id) {
