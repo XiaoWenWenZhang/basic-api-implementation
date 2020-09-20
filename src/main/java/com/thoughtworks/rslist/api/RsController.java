@@ -6,6 +6,7 @@ import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,8 @@ public class RsController {
     RsEventRepository rsEventRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    VoteRepository voteRepository;
 
     @GetMapping("/rs/{id}")
     public ResponseEntity<Optional<RsEventPO>> getOneRsEvent(@PathVariable int id) {
@@ -78,6 +81,8 @@ public class RsController {
 
 //    @PostMapping("/rs/vote/{rsEventId}")
 //    public ResponseEntity<Void> addVoteByRsEventId(@PathVariable int rsEventId, @RequestBody Vote vote) {
+//        vote.setRsEventId(rsEventId);
+//
 //        Optional<RsEventPO> OptionalRsEventPO = rsEventRepository.findById(rsEventId);
 //        RsEventPO rsEventPO =OptionalRsEventPO.get();
 //        UserPO userPO = rsEventPO.getUserPO();
@@ -85,6 +90,8 @@ public class RsController {
 //        if (userPO.getVoteNumber()<vote.getVoteNum()) return ResponseEntity.badRequest().build();
 //        userPO.setVoteNumber(userPO.getVoteNumber()-vote.getVoteNum());
 //        rsEventPO.setVoteNum(vote.getVoteNum());
+//        VotePO votePO = VotePO.builder().voteTime(LocalDateTime.now()).rsEventPO(rsEventPO).userPO(userPO).voteNum(vote.getVoteNum()).build();
+//        voteRepository.save(votePO);
 //        rsEventRepository.deleteById(rsEventId);
 //        rsEventRepository.save(rsEventPO);
 //        userRepository.deleteById(userPO.getId());

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Vote {
+    private int id;
     private int voteNum;
     private int userId;
     private int rsEventId;

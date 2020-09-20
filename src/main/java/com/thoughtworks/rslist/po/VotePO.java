@@ -21,8 +21,11 @@ public class VotePO {
     private int voteNum;
     private LocalDateTime voteTime;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private UserPO userPO;
+
     @ManyToOne
+    @JoinColumn(name = "rs_event_id")
     private RsEventPO rsEventPO;
 
 }

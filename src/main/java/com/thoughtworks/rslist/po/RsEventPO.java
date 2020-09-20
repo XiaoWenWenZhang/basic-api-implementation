@@ -20,8 +20,9 @@ public class RsEventPO {
     private int id;
     private String eventName;
     private String keyWord;
+    private int voteNum;
     @ManyToOne
     @JsonIgnore
     private UserPO userPO;
-    private int voteNum;
+
 }

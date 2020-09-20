@@ -6,6 +6,7 @@ import com.thoughtworks.rslist.po.RsEventPO;
 import com.thoughtworks.rslist.po.UserPO;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ class RsControllerTest {
     RsEventRepository rsEventRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    VoteRepository voteRepository;
     UserPO userPO1;
     UserPO userPO2;
     RsEventPO rsEventPO1;
@@ -44,6 +47,8 @@ class RsControllerTest {
     void setUp() {
         userRepository.deleteAll();
         rsEventRepository.deleteAll();
+        voteRepository.deleteAll();
+
         userPO1 = UserPO.builder()
                 .age(20)
                 .email("a@thoughtworks.com")
@@ -188,19 +193,19 @@ class RsControllerTest {
 
 //    @Test
 //    public void should_vote_rs_event_when_give_id() throws Exception {
-//        userRepository.save(userPO1);
-//        rsEventRepository.save(rsEventPO1);
+//        userRepository.save(userPO2);
+//        rsEventRepository.save(rsEventPO2);
 //        Vote vote = Vote.builder()
-//                .userId(userPO1.getId())
-//                .rsEventId(rsEventPO1.getId())
+//                .userId(userPO2.getId())
+//                .rsEventId(rsEventPO2.getId())
 //                .voteNum(3)
-//                .voteTime(LocalDateTime.of(2020, 9, 18, 23, 50))
 //                .build();
 //        String jsonString= objectMapper.writeValueAsString(vote);
-//        mockMvc.perform(post("/rs/vote/{rsEventId}",rsEventPO1.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+//        mockMvc.perform(post("/rs/vote/{rsEventId}",rsEventPO2.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
 //                .andExpect(status().isCreated());
-//        assertEquals(3,rsEventRepository.findById(rsEventPO1.getId()).get().getVoteNum());
-//        assertEquals(7,userRepository.findById(userPO1.getId()).get().getVoteNumber());
+//        assertEquals(3,rsEventRepository.findById(rsEventPO2.getId()).get().getVoteNum());
+//        assertEquals(7,userRepository.findById(userPO2.getId()).get().getVoteNumber());
+//        assertEquals(3,voteRepository.findById(vote.getId()).get().getVoteNum());
 //    }
 
 

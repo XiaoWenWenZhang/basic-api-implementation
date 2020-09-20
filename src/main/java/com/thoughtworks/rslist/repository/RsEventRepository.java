@@ -9,7 +9,8 @@ public interface RsEventRepository extends CrudRepository<RsEventPO,Integer> {
     @Override
     List<RsEventPO> findAll();
 
-
+//    @Query("select b from RsEventPO b where b.id = ?1 ")
+//    RsEventPO findByRsEventId(int id);
 
 //    @Transactional
 //    void deleteAllByUserId(int id);
